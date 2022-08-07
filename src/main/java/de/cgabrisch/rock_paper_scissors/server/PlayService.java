@@ -44,10 +44,8 @@ public class PlayService {
               .doOnNext(round -> {
                   moveService.notifyPlayer(player1, round);
                   moveService.notifyPlayer(player2, round);
-              })
-              .doAfterTerminate(() -> {
-                  availablePlayersService.checkInPlayer(player1);
-                  availablePlayersService.checkInPlayer(player2);
+                  availablePlayersService.checkInPlayer(updatePlayerAfterRound(player1, round));
+                  availablePlayersService.checkInPlayer(updatePlayerAfterRound(player2, round));
               });
         });
     }
@@ -68,5 +66,9 @@ public class PlayService {
             return new Round(uuid, player1, player2, calls, stake);
         });
         return roundTry;
+    }
+    
+    private Player updatePlayerAfterRound(Player player, Round round) {
+        return round.getWinner().map(winner -> player == winner ? player.winning(round.stake()) : player.losing(round.stake())).orElse(player);
     }
 }
