@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -29,8 +30,8 @@ public class AvailablePlayersService {
         availablePlayers.add(new Player("3", "Player 3", 99, 0, 1, "http://localhost:8083"));
     }
     
-    public CompletableFuture<Tuple2<Player, Player>> checkOutPairOfPlayers() {
-        return CompletableFuture.supplyAsync(() -> {
+    public Mono<Tuple2<Player, Player>> checkOutPairOfPlayers() {
+        return Mono.fromFuture(CompletableFuture.supplyAsync(() -> {
             try {
                 log.debug("Got check out request...");
                 Player player1 = availablePlayers.take();
@@ -41,7 +42,7 @@ public class AvailablePlayersService {
             } catch (InterruptedException e) {
                 throw new IllegalStateException(e);
             }
-        }, checkOutExecutor);
+        }, checkOutExecutor));
     }
     
     public void checkInPlayer(Player player) {

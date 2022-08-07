@@ -18,9 +18,12 @@ public class PlayService {
     
     private final AvailablePlayersService availablePlayersService;
     
+    private final MoveService moveService;
+    
     @Autowired
-    public PlayService(AvailablePlayersService availablePlayersService) {
+    public PlayService(AvailablePlayersService availablePlayersService, MoveService moveService) {
         this.availablePlayersService = availablePlayersService;
+        this.moveService = moveService;
     }
 
     public Flux<Round> playRounds(int rounds) {
@@ -28,16 +31,25 @@ public class PlayService {
     }
 
     private Mono<Round> playRound() {
-        return Mono.fromFuture(availablePlayersService.checkOutPairOfPlayers()).map((players) -> {
+        return availablePlayersService.checkOutPairOfPlayers().flatMap((players) -> {
+            Player player1 = players.getT1();
+            Player player2 = players.getT2();
+            
             String uuid = UUID.randomUUID().toString();
             log.debug("Playing round {}", uuid);
-            Calls calls = new Calls(Symbol.PAPER, Symbol.ROCK);
-            Round round = new Round(uuid, players.getT1(), players.getT2(), players.getT1(), calls, 1);
+            Mono<Move> movePlayer1 = moveService.getMoveFromPlayer(player1, uuid, player2.name());
+            Mono<Move> movePlayer2 = moveService.getMoveFromPlayer(player2, uuid, player1.name());
             
-            availablePlayersService.checkInPlayer(players.getT1());
-            availablePlayersService.checkInPlayer(players.getT2());
-            return round;
+            return Mono.zip(movePlayer1, movePlayer2).doAfterTerminate(() -> {
+                availablePlayersService.checkInPlayer(player1);
+                availablePlayersService.checkInPlayer(player2);
+            }).map((moves) -> {
+                Move move1 = moves.getT1();
+                Move move2 = moves.getT2();
+                Calls calls = new Calls(move1.symbol(), move2.symbol());
+                
+                return new Round(uuid, player1, player2, player1, calls, 1);
+            });
         });
     }
-
 }
