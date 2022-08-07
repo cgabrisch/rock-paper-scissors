@@ -24,12 +24,6 @@ public class AvailablePlayersService {
             (runnable) -> new Thread(runnable, "available-players-check-out"));
     private final BlockingQueue<Player> availablePlayers = new LinkedBlockingQueue<>();
     
-    AvailablePlayersService() {
-        availablePlayers.add(new Player("1", "Player 1", 101, 1, 0, "http://localhost:8081"));
-        availablePlayers.add(new Player("2", "Player 2", 99, 0, 1, "http://localhost:8082"));
-        availablePlayers.add(new Player("3", "Player 3", 99, 0, 1, "http://localhost:8083"));
-    }
-    
     public Mono<Tuple2<Player, Player>> checkOutPairOfPlayers() {
         return Mono.fromFuture(CompletableFuture.supplyAsync(() -> {
             try {
