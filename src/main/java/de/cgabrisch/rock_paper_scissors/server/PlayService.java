@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.cgabrisch.rock_paper_scissors.api.round.Move;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,8 +43,7 @@ public class PlayService {
             
             return roundTry
               .doOnNext(round -> {
-                  moveService.notifyPlayer(player1, round);
-                  moveService.notifyPlayer(player2, round);
+                  Flux.concat(moveService.notifyPlayer(player1, round), moveService.notifyPlayer(player2, round)).subscribe();
                   availablePlayersService.checkInPlayer(updatePlayerAfterRound(player1, round));
                   availablePlayersService.checkInPlayer(updatePlayerAfterRound(player2, round));
               });

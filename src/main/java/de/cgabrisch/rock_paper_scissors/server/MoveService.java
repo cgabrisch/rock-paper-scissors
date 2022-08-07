@@ -1,30 +1,25 @@
 package de.cgabrisch.rock_paper_scissors.server;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import de.cgabrisch.rock_paper_scissors.api.round.Move;
+import de.cgabrisch.rock_paper_scissors.api.round.MoveRequest;
+import de.cgabrisch.rock_paper_scissors.api.round.RoundResult;
+import de.cgabrisch.rock_paper_scissors.api.round.RoundResult.Result;
 import reactor.core.publisher.Mono;
 
 @Service
 public class MoveService {
-    private final static Logger log = LoggerFactory.getLogger(MoveService.class);
-    private final static int SYMBOL_COUNT = Symbol.values().length;
-    
     Mono<Move> getMoveFromPlayer(Player player, String roundId, String opponentName) {
-        int index = Double.valueOf(Math.random() * SYMBOL_COUNT).intValue();
-        int stake = Double.valueOf(Math.random() * player.credit()).intValue() + 1;
-        
-        Move move = new Move(stake, Symbol.values()[index]);
-        
-        log.debug("{} in round {} against {}: {}", player.name(), roundId, opponentName, move);
-        
-        return Mono.just(move);
+        return WebClient.create(player.clientUrl()).post().uri("/round/call/{playerId}", player.id()).bodyValue(new MoveRequest(roundId, opponentName, player.credit())).retrieve().bodyToMono(Move.class);
     }
     
-    void notifyPlayer(Player player, Round round) {
+    Mono<Void> notifyPlayer(Player player, Round round) {
         Result result = round.getWinner().map(winner -> winner.equals(player) ? Result.WON : Result.LOST).orElse(Result.DRAW);
+
+        int stake = Result.DRAW.equals(result) ? 0 : round.stake();
         
-        log.debug("{} in round {}: {}", player.name(), round.roundId(), result);
+        return WebClient.create(player.clientUrl()).post().uri("/round/result/{playerId}", player.id()).bodyValue(new RoundResult(round.roundId(), result, stake)).retrieve().bodyToMono(Void.class);
     }
 }
