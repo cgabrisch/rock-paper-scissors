@@ -1,19 +1,36 @@
 package de.cgabrisch.rock_paper_scissors.server;
 
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class PlayService {
+    private final AvailablePlayersService availablePlayersService;
+    
+    @Autowired
+    public PlayService(AvailablePlayersService availablePlayersService) {
+        this.availablePlayersService = availablePlayersService;
+    }
+
     public Flux<Round> playRounds(int rounds) {
-        Player player1 = new Player("1", "Player 1", 101, 1, 0, "http://localhost:8081");
-        Player player2 = new Player("2", "Player 2", 99, 0, 1, "http://localhost:8082");
-        Calls calls = new Calls(Symbol.PAPER, Symbol.ROCK);
-        Round round = new Round(player1, player2, player1, calls, 1);
-        return Flux.fromStream(Stream.generate(() -> round)).take(rounds, true);
+        return Flux.merge(IntStream.range(0, rounds).mapToObj(i -> playRound()).collect(Collectors.toList()));
+    }
+
+    private Mono<Round> playRound() {
+        return Mono.fromFuture(availablePlayersService.checkOutPairOfPlayers()).map((players) -> {
+            Calls calls = new Calls(Symbol.PAPER, Symbol.ROCK);
+            Round round = new Round(players.getT1(), players.getT2(), players.getT1(), calls, 1);
+            
+            availablePlayersService.checkInPlayer(players.getT1());
+            availablePlayersService.checkInPlayer(players.getT2());
+            return round;
+        });
     }
 
 }
