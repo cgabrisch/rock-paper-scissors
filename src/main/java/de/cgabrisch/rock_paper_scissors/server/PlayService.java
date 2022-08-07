@@ -19,12 +19,12 @@ public class PlayService {
     
     private final AvailablePlayersService availablePlayersService;
     
-    private final MoveService moveService;
+    private final RoundService roundService;
     
     @Autowired
-    public PlayService(AvailablePlayersService availablePlayersService, MoveService moveService) {
+    public PlayService(AvailablePlayersService availablePlayersService, RoundService roundService) {
         this.availablePlayersService = availablePlayersService;
-        this.moveService = moveService;
+        this.roundService = roundService;
     }
 
     public Flux<Round> playRounds(int rounds) {
@@ -43,7 +43,7 @@ public class PlayService {
             
             return roundTry
               .doOnNext(round -> {
-                  Flux.concat(moveService.notifyPlayer(player1, round), moveService.notifyPlayer(player2, round)).subscribe();
+                  Flux.concat(roundService.notifyPlayer(player1, round), roundService.notifyPlayer(player2, round)).subscribe();
                   availablePlayersService.checkInPlayer(updatePlayerAfterRound(player1, round));
                   availablePlayersService.checkInPlayer(updatePlayerAfterRound(player2, round));
               });
@@ -51,8 +51,8 @@ public class PlayService {
     }
 
     private Mono<Round> roundTry(String uuid, Player player1, Player player2) {
-        Mono<Move> movePlayer1 = moveService.getMoveFromPlayer(player1, uuid, player2.name());
-        Mono<Move> movePlayer2 = moveService.getMoveFromPlayer(player2, uuid, player1.name());
+        Mono<Move> movePlayer1 = roundService.getMoveFromPlayer(player1, uuid, player2.name());
+        Mono<Move> movePlayer2 = roundService.getMoveFromPlayer(player2, uuid, player1.name());
         
         Mono<Round> roundTry = Mono.zip(movePlayer1, movePlayer2).map((moves) -> {
             Move move1 = moves.getT1();

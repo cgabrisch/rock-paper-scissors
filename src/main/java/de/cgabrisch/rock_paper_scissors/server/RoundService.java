@@ -10,7 +10,7 @@ import de.cgabrisch.rock_paper_scissors.api.round.RoundResult.Result;
 import reactor.core.publisher.Mono;
 
 @Service
-public class MoveService {
+public class RoundService {
     Mono<Move> getMoveFromPlayer(Player player, String roundId, String opponentName) {
         return WebClient.create(player.clientUrl()).post().uri("/round/call/{playerId}", player.id()).bodyValue(new MoveRequest(roundId, opponentName, player.credit())).retrieve().bodyToMono(Move.class);
     }
