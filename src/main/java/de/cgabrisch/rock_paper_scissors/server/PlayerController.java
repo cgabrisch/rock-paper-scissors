@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.cgabrisch.rock_paper_scissors.api.player.PlayerId;
+import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -18,10 +20,6 @@ public class PlayerController {
     
     @Autowired
     private AvailablePlayersService availablePlayersService;
-
-    static record PlayerId(String id) {
-
-    }
 
     @PostMapping("/players")
     Mono<PlayerId> newPlayer(@RequestBody @Valid PlayerRegistration playerRegistration) {

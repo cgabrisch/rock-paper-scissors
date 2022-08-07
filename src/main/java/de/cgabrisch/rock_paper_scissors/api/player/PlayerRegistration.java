@@ -1,4 +1,4 @@
-package de.cgabrisch.rock_paper_scissors.server;
+package de.cgabrisch.rock_paper_scissors.api.player;
 
 import javax.validation.constraints.NotEmpty;
 
