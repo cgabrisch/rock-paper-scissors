@@ -51,8 +51,8 @@ public class PlayService {
                 int stake = Math.min(sanitizedStake1, sanitizedStake2);
                 
                 Calls calls = new Calls(move1.symbol(), move2.symbol());
-                
-                return new Round(uuid, player1, player2, player1, calls, stake);
+
+                return new Round(uuid, player1, player2, calls, stake);
             });
         });
     }
