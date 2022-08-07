@@ -21,4 +21,10 @@ public class MoveService {
         
         return Mono.just(move);
     }
+    
+    void notifyPlayer(Player player, Round round) {
+        Result result = round.getWinner().map(winner -> winner.equals(player) ? Result.WON : Result.LOST).orElse(Result.DRAW);
+        
+        log.debug("{} in round {}: {}", player.name(), round.roundId(), result);
+    }
 }

@@ -37,23 +37,36 @@ public class PlayService {
             
             String uuid = UUID.randomUUID().toString();
             log.debug("Playing round {}", uuid);
-            Mono<Move> movePlayer1 = moveService.getMoveFromPlayer(player1, uuid, player2.name());
-            Mono<Move> movePlayer2 = moveService.getMoveFromPlayer(player2, uuid, player1.name());
             
-            return Mono.zip(movePlayer1, movePlayer2).doAfterTerminate(() -> {
-                availablePlayersService.checkInPlayer(player1);
-                availablePlayersService.checkInPlayer(player2);
-            }).map((moves) -> {
-                Move move1 = moves.getT1();
-                int sanitizedStake1 = Math.min(player1.credit(), move1.stake());
-                Move move2 = moves.getT2();
-                int sanitizedStake2 = Math.min(player2.credit(), move2.stake());
-                int stake = Math.min(sanitizedStake1, sanitizedStake2);
-                
-                Calls calls = new Calls(move1.symbol(), move2.symbol());
-
-                return new Round(uuid, player1, player2, calls, stake);
-            });
+            Mono<Round> roundTry = roundTry(uuid, player1, player2);
+            
+            return roundTry
+              .doOnNext(round -> {
+                  moveService.notifyPlayer(player1, round);
+                  moveService.notifyPlayer(player2, round);
+              })
+              .doAfterTerminate(() -> {
+                  availablePlayersService.checkInPlayer(player1);
+                  availablePlayersService.checkInPlayer(player2);
+              });
         });
+    }
+
+    private Mono<Round> roundTry(String uuid, Player player1, Player player2) {
+        Mono<Move> movePlayer1 = moveService.getMoveFromPlayer(player1, uuid, player2.name());
+        Mono<Move> movePlayer2 = moveService.getMoveFromPlayer(player2, uuid, player1.name());
+        
+        Mono<Round> roundTry = Mono.zip(movePlayer1, movePlayer2).map((moves) -> {
+            Move move1 = moves.getT1();
+            int sanitizedStake1 = Math.min(player1.credit(), move1.stake());
+            Move move2 = moves.getT2();
+            int sanitizedStake2 = Math.min(player2.credit(), move2.stake());
+            int stake = Math.min(sanitizedStake1, sanitizedStake2);
+            
+            Calls calls = new Calls(move1.symbol(), move2.symbol());
+
+            return new Round(uuid, player1, player2, calls, stake);
+        });
+        return roundTry;
     }
 }
