@@ -45,10 +45,14 @@ public class PlayService {
                 availablePlayersService.checkInPlayer(player2);
             }).map((moves) -> {
                 Move move1 = moves.getT1();
+                int sanitizedStake1 = Math.min(player1.credit(), move1.stake());
                 Move move2 = moves.getT2();
+                int sanitizedStake2 = Math.min(player2.credit(), move2.stake());
+                int stake = Math.min(sanitizedStake1, sanitizedStake2);
+                
                 Calls calls = new Calls(move1.symbol(), move2.symbol());
                 
-                return new Round(uuid, player1, player2, player1, calls, 1);
+                return new Round(uuid, player1, player2, player1, calls, stake);
             });
         });
     }
