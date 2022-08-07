@@ -47,8 +47,12 @@ public class AvailablePlayersService {
     
     public void checkInPlayer(Player player) {
         CompletableFuture.runAsync(() -> {
-            log.debug("Checking in {}", player);
-            this.availablePlayers.add(player);
+            if (player.credit() > 0) {
+                log.debug("Checking in {}", player);
+                this.availablePlayers.add(player);
+            } else {
+                log.debug("Will not check in {} - zero credits", player);
+            }
         }, checkInExecutor);
     }
 }
