@@ -1,5 +1,6 @@
 package de.cgabrisch.rock_paper_scissors.gameserver;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -67,7 +68,16 @@ class GameService {
             
             Calls calls = new Calls(move1.symbol(), move2.symbol());
 
-            return new Round(roundId, player1, player2, calls, stake);
+            Player winner;
+            if (calls.playerOne().beats(calls.playerTwo())) {
+                winner = player1;
+            } else if (calls.playerTwo().beats(calls.playerOne())) {
+                winner = player2;
+            } else {
+                winner = null;
+            }
+
+            return new Round(roundId, player1, player2, winner, calls, stake);
         });
     }
 
@@ -83,7 +93,7 @@ class GameService {
     
     private Player updatePlayerStatsAfterRound(Player player, Round round) {
         // TODO updating the player's statistics should be the responsibility of player registry
-        return round.getWinner().map(winner -> player == winner ? player.winning(round.stake()) : player.losing(round.stake())).orElse(player);
+        return Optional.ofNullable(round.winner()).map(winner -> player == winner ? player.winning(round.stake()) : player.losing(round.stake())).orElse(player);
     }
 
     private Mono<Opponents> requestOpponents() {
