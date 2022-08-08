@@ -1,4 +1,4 @@
-package de.cgabrisch.rock_paper_scissors.server;
+package de.cgabrisch.rock_paper_scissors.gameserver;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

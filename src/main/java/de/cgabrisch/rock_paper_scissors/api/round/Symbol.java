@@ -1,9 +1,9 @@
-package de.cgabrisch.rock_paper_scissors.server;
+package de.cgabrisch.rock_paper_scissors.api.round;
 
 public enum Symbol {
     ROCK, SCISSORS, PAPER;
 
-    boolean beats(Symbol other) {
+    public boolean beats(Symbol other) {
         return (switch (this) {
             case PAPER -> ROCK;
             case ROCK -> SCISSORS;

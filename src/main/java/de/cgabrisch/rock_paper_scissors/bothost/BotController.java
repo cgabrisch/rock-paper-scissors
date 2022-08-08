@@ -19,7 +19,7 @@ import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
 import de.cgabrisch.rock_paper_scissors.api.round.Move;
 import de.cgabrisch.rock_paper_scissors.api.round.MoveRequest;
 import de.cgabrisch.rock_paper_scissors.api.round.RoundResult;
-import de.cgabrisch.rock_paper_scissors.server.Symbol;
+import de.cgabrisch.rock_paper_scissors.api.round.Symbol;
 import reactor.core.publisher.Mono;
 
 @RestController

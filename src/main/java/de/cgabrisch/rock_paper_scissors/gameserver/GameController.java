@@ -1,4 +1,4 @@
-package de.cgabrisch.rock_paper_scissors.server;
+package de.cgabrisch.rock_paper_scissors.gameserver;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
