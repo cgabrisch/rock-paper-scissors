@@ -18,14 +18,13 @@ import reactor.core.publisher.Mono;
 @Service
 class AvailablePlayersService {
     private final static Logger log = LoggerFactory.getLogger(AvailablePlayersService.class);
-    
-    private final Executor checkInExecutor = Executors.newSingleThreadScheduledExecutor(
-            (runnable) -> new Thread(runnable, "available-players-check-in"));
-    private final Executor checkOutExecutor = Executors.newSingleThreadScheduledExecutor(
-            (runnable) -> new Thread(runnable, "available-players-check-out"));
+
+    private final Executor requestOppoentsExecutor = Executors
+            .newSingleThreadScheduledExecutor((runnable) -> new Thread(runnable, "opponents-request"));
     private final BlockingQueue<Player> availablePlayers = new LinkedBlockingQueue<>();
-    
+
     Mono<Opponents> requestOpponents() {
+        // We take a pair of players in a single thread only to avoid race conditions
         return Mono.fromFuture(CompletableFuture.supplyAsync(() -> {
             try {
                 log.debug("Got opponents request...");
@@ -37,32 +36,27 @@ class AvailablePlayersService {
             } catch (InterruptedException e) {
                 throw new IllegalStateException(e);
             }
-        }, checkOutExecutor));
+        }, requestOppoentsExecutor));
     }
-    
+
     void releaseOpponents(Opponents opponents) {
         log.debug("Releasing opponents {}", opponents);
-        CompletableFuture.runAsync(() -> {
-            Arrays.asList(opponents.player1(), opponents.player2()).forEach(player -> {
-                if (player.credit() > 0) {
-                    log.debug("Adding {} to available players", player);
-                    this.availablePlayers.add(player);
-                } else {
-                    log.debug("Will not add {} to available players - zero credits", player);
-                }
-            });
-        }, checkInExecutor);
-        
-    }
-    
-    void addPlayer(Player player) {
-        CompletableFuture.runAsync(() -> {
+        Arrays.asList(opponents.player1(), opponents.player2()).forEach(player -> {
             if (player.credit() > 0) {
                 log.debug("Adding {} to available players", player);
                 this.availablePlayers.add(player);
             } else {
                 log.debug("Will not add {} to available players - zero credits", player);
             }
-        }, checkInExecutor);
+        });
+    }
+
+    void addPlayer(Player player) {
+        if (player.credit() > 0) {
+            log.debug("Adding {} to available players", player);
+            this.availablePlayers.add(player);
+        } else {
+            log.debug("Will not add {} to available players - zero credits", player);
+        }
     }
 }
