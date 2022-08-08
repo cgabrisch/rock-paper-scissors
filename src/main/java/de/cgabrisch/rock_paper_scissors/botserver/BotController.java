@@ -1,4 +1,4 @@
-package de.cgabrisch.rock_paper_scissors.bothost;
+package de.cgabrisch.rock_paper_scissors.botserver;
 
 import java.util.HashMap;
 import java.util.Map;
