@@ -58,7 +58,7 @@ class BotController {
             .map(player -> {
                 Move move = bot.getMove(player.credit());
                 
-                log.debug("Round {}: {}'s move against {} is {}", moveRequest.roundId(), bot, moveRequest.opponent(), move);
+                log.debug("Round {}: {}'s move against {} is {}", moveRequest.roundId(), bot.getName(), moveRequest.opponent(), move);
                 
                 return move;
             });
@@ -68,8 +68,12 @@ class BotController {
     void notifyResult(@PathVariable("playerId") String playerId, @RequestBody RoundResult roundResult) {
         Bot bot = getBotForPlayerId(playerId);
         
-        // TODO DRAW berücksichtigen
-        log.debug("Round {}: {} {} amount: {} ", roundResult.roundId(), bot.getName(), roundResult.result(), roundResult.stake());
+        String logMessage = switch (roundResult.result()) {
+            case DRAW -> "Round {} is draw: No credit change for {}";
+            case LOST -> "Round {}: {} loses {}";
+            case WON -> "Round {}: {} wins {}";
+        };
+        log.debug(logMessage, roundResult.roundId(), bot.getName(), roundResult.stake());
     }
     
 
