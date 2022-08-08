@@ -4,6 +4,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +14,7 @@ import de.cgabrisch.rock_paper_scissors.api.player.Opponents;
 import de.cgabrisch.rock_paper_scissors.api.player.Player;
 import de.cgabrisch.rock_paper_scissors.api.player.PlayerId;
 import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,6 +33,17 @@ class PlayerController {
                 .doOnNext(playerRepository::addPlayer)
                 .map(Player::id)
                 .map(PlayerId::new);
+    }
+    
+    @GetMapping("/players")
+    Flux<Player> getPlayers() {
+        return Flux.fromIterable(playerRepository.getAllPlayers());
+    }
+    
+    @GetMapping("/players/{playerId}")
+    Mono<Player> getPlayer(@PathVariable("playerId") String playerId) {
+        // TODO return 404 if not known
+        return Mono.justOrEmpty(playerRepository.getPlayer(playerId));
     }
     
     @PostMapping("/opponents/request")
