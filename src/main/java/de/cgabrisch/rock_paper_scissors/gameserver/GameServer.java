@@ -12,6 +12,7 @@ public class GameServer {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(GameServer.class);
         
+        // TODO externalize configuration
         Map<String, Object> gameServerConfig = new HashMap<>();
         gameServerConfig.put("server.port", 8080);
         gameServerConfig.put("player_registry.url", "http://localhost:8082");

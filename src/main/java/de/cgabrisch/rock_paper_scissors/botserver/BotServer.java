@@ -12,6 +12,7 @@ public class BotServer {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(BotServer.class);
         
+        // TODO externalize configuration
         Map<String, Object> botServerConfig = new HashMap<>();
         botServerConfig.put("server.port", 8081);
         botServerConfig.put("player_registry.url", "http://localhost:8082");

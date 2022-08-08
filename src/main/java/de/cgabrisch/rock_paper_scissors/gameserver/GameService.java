@@ -82,6 +82,7 @@ class GameService {
     }
     
     private Player updatePlayerStatsAfterRound(Player player, Round round) {
+        // TODO updating the player's statistics should be the responsibility of player registry
         return round.getWinner().map(winner -> player == winner ? player.winning(round.stake()) : player.losing(round.stake())).orElse(player);
     }
 

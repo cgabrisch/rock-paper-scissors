@@ -12,6 +12,7 @@ public class PlayerRegistry {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(PlayerRegistry.class);
         
+        // TODO externalize configuration
         Map<String, Object> config = new HashMap<>();
         config.put("server.port", 8082);
         app.setDefaultProperties(config);

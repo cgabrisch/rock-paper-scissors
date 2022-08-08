@@ -74,7 +74,7 @@ class PlayerRepository {
         
         Player previousPlayer = playerIdsToPlayers.putIfAbsent(player.id(), player);
         if (previousPlayer != null) {
-            // TODO Indicates that our id generation is broken
+            // If this ever happens, then our id generation is broken
             log.error("A player with id {} exists already", player.id());
             return;
         }
