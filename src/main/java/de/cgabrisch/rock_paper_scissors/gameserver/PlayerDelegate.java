@@ -11,7 +11,7 @@ import de.cgabrisch.rock_paper_scissors.shared.round.RoundResult.Result;
 import reactor.core.publisher.Mono;
 
 @Service
-class RoundService {
+class PlayerDelegate { 
     Mono<Move> getMoveFromPlayer(Player player, String roundId, String opponentName) {
         return WebClient.create(player.clientUrl()).post().uri("/round/call/{playerId}", player.id()).bodyValue(new MoveRequest(roundId, opponentName)).retrieve().bodyToMono(Move.class);
     }

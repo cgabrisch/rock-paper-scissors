@@ -22,14 +22,14 @@ class GameService {
     private final static Logger log = LoggerFactory.getLogger(GameService.class);
     
     private final String playerRegistryUrl;
-    private final RoundService roundService;
+    private final PlayerDelegate playerDelegate;
     
     @Autowired
     GameService(
             @Value("${player_registry.url}") String playerRegistryUrl,
-            RoundService roundService) {
+            PlayerDelegate playerDelegate) {
         this.playerRegistryUrl = playerRegistryUrl;
-        this.roundService = roundService;
+        this.playerDelegate = playerDelegate;
     }
 
     Flux<Round> playRounds(int rounds) {
@@ -47,15 +47,15 @@ class GameService {
             return roundMono(roundId, player1, player2)
               .doOnNext(round -> {
                   Flux.concat(
-                          roundService.notifyPlayer(player1, round), roundService.notifyPlayer(player2, round),
+                          playerDelegate.notifyPlayer(player1, round), playerDelegate.notifyPlayer(player2, round),
                           releaseOpponents(updateOpponentStatsAfterRound(opponents, round))).subscribe();
               });
         });
     }
 
     private Mono<Round> roundMono(String roundId, Player player1, Player player2) {
-        Mono<Move> movePlayer1 = roundService.getMoveFromPlayer(player1, roundId, player2.name());
-        Mono<Move> movePlayer2 = roundService.getMoveFromPlayer(player2, roundId, player1.name());
+        Mono<Move> movePlayer1 = playerDelegate.getMoveFromPlayer(player1, roundId, player2.name());
+        Mono<Move> movePlayer2 = playerDelegate.getMoveFromPlayer(player2, roundId, player1.name());
         
         return Mono.zip(movePlayer1, movePlayer2).map((moves) -> {
             Move move1 = moves.getT1();
