@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import de.cgabrisch.rock_paper_scissors.api.player.Player;
 import de.cgabrisch.rock_paper_scissors.api.player.PlayerId;
 import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
 import de.cgabrisch.rock_paper_scissors.api.round.Move;
@@ -45,17 +46,23 @@ public class BotController {
     }
     
     @PostMapping("/round/call/{playerId}")
-    Move requestMove(@PathVariable("playerId") String playerId, @RequestBody MoveRequest moveRequest) {
-        String player = this.playerIdsToNames.getOrDefault(playerId, "UNKNOWN"); // TODO throw error if unknown
+    Mono<Move> requestMove(@PathVariable("playerId") String playerId, @RequestBody MoveRequest moveRequest) {
+        String playerName = this.playerIdsToNames.getOrDefault(playerId, "UNKNOWN"); // TODO throw error if unknown
         
-        int index = Double.valueOf(Math.random() * SYMBOL_COUNT).intValue();
-        int stake = Double.valueOf(Math.random() * moveRequest.credit()).intValue() + 1;
-        
-        Move move = new Move(stake, Symbol.values()[index]);
-        
-        log.debug("Round {}: {}'s move against {} is {}", moveRequest.roundId(), player, moveRequest.opponent(), move);
-        
-        return move;
+        return WebClient.create(playerRegistryUrl)
+            .get().uri("/players/{playerId}", playerId)
+            .retrieve()
+            .bodyToMono(Player.class)
+            .map(player -> {
+                int index = Double.valueOf(Math.random() * SYMBOL_COUNT).intValue();
+                int stake = Double.valueOf(Math.random() * player.credit()).intValue() + 1;
+                
+                Move move = new Move(stake, Symbol.values()[index]);
+                
+                log.debug("Round {}: {}'s move against {} is {}", moveRequest.roundId(), playerName, moveRequest.opponent(), move);
+                
+                return move;
+            });
     }
     
     @PostMapping("/round/result/{playerId}")
