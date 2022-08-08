@@ -3,11 +3,11 @@ package de.cgabrisch.rock_paper_scissors.gameserver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import de.cgabrisch.rock_paper_scissors.api.player.Player;
-import de.cgabrisch.rock_paper_scissors.api.round.Move;
-import de.cgabrisch.rock_paper_scissors.api.round.MoveRequest;
-import de.cgabrisch.rock_paper_scissors.api.round.RoundResult;
-import de.cgabrisch.rock_paper_scissors.api.round.RoundResult.Result;
+import de.cgabrisch.rock_paper_scissors.shared.player.Player;
+import de.cgabrisch.rock_paper_scissors.shared.round.Move;
+import de.cgabrisch.rock_paper_scissors.shared.round.MoveRequest;
+import de.cgabrisch.rock_paper_scissors.shared.round.RoundResult;
+import de.cgabrisch.rock_paper_scissors.shared.round.RoundResult.Result;
 import reactor.core.publisher.Mono;
 
 @Service

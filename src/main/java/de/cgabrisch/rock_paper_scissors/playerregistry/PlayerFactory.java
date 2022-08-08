@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import de.cgabrisch.rock_paper_scissors.api.player.Player;
-import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
+import de.cgabrisch.rock_paper_scissors.shared.player.Player;
+import de.cgabrisch.rock_paper_scissors.shared.player.PlayerRegistration;
 
 @Service
 class PlayerFactory {

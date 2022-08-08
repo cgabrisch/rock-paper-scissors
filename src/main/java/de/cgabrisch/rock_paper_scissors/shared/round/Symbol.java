@@ -1,4 +1,4 @@
-package de.cgabrisch.rock_paper_scissors.api.round;
+package de.cgabrisch.rock_paper_scissors.shared.round;
 
 public enum Symbol {
     ROCK, SCISSORS, PAPER;

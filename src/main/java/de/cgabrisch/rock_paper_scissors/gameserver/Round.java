@@ -2,7 +2,7 @@ package de.cgabrisch.rock_paper_scissors.gameserver;
 
 import java.util.Optional;
 
-import de.cgabrisch.rock_paper_scissors.api.player.Player;
+import de.cgabrisch.rock_paper_scissors.shared.player.Player;
 
 record Round(String roundId, Player player1, Player player2, Calls calls, int stake) {
     Optional<Player> getWinner() {

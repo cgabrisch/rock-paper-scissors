@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import de.cgabrisch.rock_paper_scissors.api.player.Player;
-import de.cgabrisch.rock_paper_scissors.api.player.PlayerId;
-import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
-import de.cgabrisch.rock_paper_scissors.api.round.Move;
-import de.cgabrisch.rock_paper_scissors.api.round.MoveRequest;
-import de.cgabrisch.rock_paper_scissors.api.round.RoundResult;
-import de.cgabrisch.rock_paper_scissors.api.round.Symbol;
+import de.cgabrisch.rock_paper_scissors.shared.player.Player;
+import de.cgabrisch.rock_paper_scissors.shared.player.PlayerId;
+import de.cgabrisch.rock_paper_scissors.shared.player.PlayerRegistration;
+import de.cgabrisch.rock_paper_scissors.shared.round.Move;
+import de.cgabrisch.rock_paper_scissors.shared.round.MoveRequest;
+import de.cgabrisch.rock_paper_scissors.shared.round.RoundResult;
+import de.cgabrisch.rock_paper_scissors.shared.round.Symbol;
 import reactor.core.publisher.Mono;
 
 @RestController

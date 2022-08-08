@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import de.cgabrisch.rock_paper_scissors.api.player.Opponents;
-import de.cgabrisch.rock_paper_scissors.api.player.Player;
+import de.cgabrisch.rock_paper_scissors.shared.player.Opponents;
+import de.cgabrisch.rock_paper_scissors.shared.player.Player;
 import reactor.core.publisher.Mono;
 
 @Repository

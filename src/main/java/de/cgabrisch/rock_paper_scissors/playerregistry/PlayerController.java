@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.cgabrisch.rock_paper_scissors.api.player.Opponents;
-import de.cgabrisch.rock_paper_scissors.api.player.Player;
-import de.cgabrisch.rock_paper_scissors.api.player.PlayerId;
-import de.cgabrisch.rock_paper_scissors.api.player.PlayerRegistration;
+import de.cgabrisch.rock_paper_scissors.shared.player.Opponents;
+import de.cgabrisch.rock_paper_scissors.shared.player.Player;
+import de.cgabrisch.rock_paper_scissors.shared.player.PlayerId;
+import de.cgabrisch.rock_paper_scissors.shared.player.PlayerRegistration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
