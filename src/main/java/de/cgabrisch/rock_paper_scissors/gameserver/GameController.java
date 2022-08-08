@@ -15,12 +15,12 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/game")
 @Validated
-public class GameController {
+class GameController {
     @Autowired
     private GameService gameService;
 
     @GetMapping("/play/{rounds}")
-    public Flux<Round> playGame(@PathVariable @Valid @Min(1) int rounds) {
+    Flux<Round> playGame(@PathVariable @Valid @Min(1) int rounds) {
         return this.gameService.playRounds(rounds);
     }
 }

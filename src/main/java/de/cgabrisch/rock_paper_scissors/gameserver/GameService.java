@@ -18,21 +18,21 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class GameService {
+class GameService {
     private final static Logger log = LoggerFactory.getLogger(GameService.class);
     
     private final String playerRegistryUrl;
     private final RoundService roundService;
     
     @Autowired
-    public GameService(
+    GameService(
             @Value("${player_registry.url}") String playerRegistryUrl,
             RoundService roundService) {
         this.playerRegistryUrl = playerRegistryUrl;
         this.roundService = roundService;
     }
 
-    public Flux<Round> playRounds(int rounds) {
+    Flux<Round> playRounds(int rounds) {
         return Flux.merge(IntStream.range(0, rounds).mapToObj(i -> playRound()).collect(Collectors.toList()));
     }
 

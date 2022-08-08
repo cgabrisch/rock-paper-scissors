@@ -23,7 +23,7 @@ import de.cgabrisch.rock_paper_scissors.api.round.Symbol;
 import reactor.core.publisher.Mono;
 
 @RestController
-public class BotController {
+class BotController {
     private final static int SYMBOL_COUNT = Symbol.values().length;
     private final static Logger log = LoggerFactory.getLogger(BotController.class);
     

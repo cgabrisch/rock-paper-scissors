@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import de.cgabrisch.rock_paper_scissors.api.player.Player;
 
-public record Round(String roundId, Player player1, Player player2, Calls calls, int stake) {
-    public Optional<Player> getWinner() {
+record Round(String roundId, Player player1, Player player2, Calls calls, int stake) {
+    Optional<Player> getWinner() {
         if (calls.playerOne().beats(calls.playerTwo())) {
             return Optional.of(player1);
         }
