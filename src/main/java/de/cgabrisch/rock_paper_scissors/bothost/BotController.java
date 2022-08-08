@@ -26,8 +26,8 @@ public class BotController {
     private final static int SYMBOL_COUNT = Symbol.values().length;
     private final static Logger log = LoggerFactory.getLogger(BotController.class);
     
-    @Value("${rps_server.url}")
-    private String rpsServerUrl;
+    @Value("${player_registry.url}")
+    private String playerRegistryUrl;
     
     @Value("${own_server.url}")
     private String ownUrl;
@@ -36,7 +36,7 @@ public class BotController {
     
     @PostMapping("/bots")
     Mono<PlayerId> newBot(@RequestParam("name") String name) {
-        return WebClient.create(rpsServerUrl + "/players")
+        return WebClient.create(playerRegistryUrl + "/players")
                 .post()
                 .bodyValue(new PlayerRegistration(name, ownUrl))
                 .retrieve()

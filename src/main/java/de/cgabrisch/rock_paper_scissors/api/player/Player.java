@@ -1,4 +1,4 @@
-package de.cgabrisch.rock_paper_scissors.server;
+package de.cgabrisch.rock_paper_scissors.api.player;
 
 public record Player(String id, String name, String clientUrl, int credit, int won, int lost) {
     public Player winning(int stake) {

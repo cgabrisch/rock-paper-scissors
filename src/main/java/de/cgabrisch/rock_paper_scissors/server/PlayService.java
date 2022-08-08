@@ -7,8 +7,12 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import de.cgabrisch.rock_paper_scissors.api.player.Opponents;
+import de.cgabrisch.rock_paper_scissors.api.player.Player;
 import de.cgabrisch.rock_paper_scissors.api.round.Move;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,13 +21,15 @@ import reactor.core.publisher.Mono;
 public class PlayService {
     private final static Logger log = LoggerFactory.getLogger(PlayService.class);
     
-    private final AvailablePlayersService availablePlayersService;
-    
+    private final String playerRegistryUrl;
     private final RoundService roundService;
     
+    
     @Autowired
-    public PlayService(AvailablePlayersService availablePlayersService, RoundService roundService) {
-        this.availablePlayersService = availablePlayersService;
+    public PlayService(
+            @Value("${player_registry.url}") String playerRegistryUrl,
+            RoundService roundService) {
+        this.playerRegistryUrl = playerRegistryUrl;
         this.roundService = roundService;
     }
 
@@ -32,9 +38,9 @@ public class PlayService {
     }
 
     private Mono<Round> playRound() {
-        return availablePlayersService.checkOutPairOfPlayers().flatMap((players) -> {
-            Player player1 = players.getT1();
-            Player player2 = players.getT2();
+        return requestOpponents().flatMap((opponents) -> {
+            Player player1 = opponents.player1();
+            Player player2 = opponents.player2();
             
             String uuid = UUID.randomUUID().toString();
             log.debug("Playing round {}", uuid);
@@ -43,9 +49,9 @@ public class PlayService {
             
             return roundTry
               .doOnNext(round -> {
-                  Flux.concat(roundService.notifyPlayer(player1, round), roundService.notifyPlayer(player2, round)).subscribe();
-                  availablePlayersService.checkInPlayer(updatePlayerAfterRound(player1, round));
-                  availablePlayersService.checkInPlayer(updatePlayerAfterRound(player2, round));
+                  Flux.concat(
+                          roundService.notifyPlayer(player1, round), roundService.notifyPlayer(player2, round),
+                          releaseOpponents(updateOpponentStatsAfterRound(opponents, round))).subscribe();
               });
         });
     }
@@ -68,7 +74,21 @@ public class PlayService {
         return roundTry;
     }
     
-    private Player updatePlayerAfterRound(Player player, Round round) {
+    private Opponents updateOpponentStatsAfterRound(Opponents opponents, Round round) {
+        return new Opponents(
+                updatePlayerStatsAfterRound(opponents.player1(), round), 
+                updatePlayerStatsAfterRound(opponents.player2(), round));
+    }
+    
+    private Player updatePlayerStatsAfterRound(Player player, Round round) {
         return round.getWinner().map(winner -> player == winner ? player.winning(round.stake()) : player.losing(round.stake())).orElse(player);
+    }
+
+    private Mono<Opponents> requestOpponents() {
+        return WebClient.create(playerRegistryUrl).post().uri("/opponents/request").retrieve().bodyToMono(Opponents.class);
+    }
+    
+    private Mono<Void> releaseOpponents(Opponents opponents) {
+        return WebClient.create(playerRegistryUrl).post().uri("/opponents/release").bodyValue(opponents).retrieve().bodyToMono(Void.class);
     }
 }

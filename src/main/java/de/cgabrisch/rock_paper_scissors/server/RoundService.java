@@ -3,6 +3,7 @@ package de.cgabrisch.rock_paper_scissors.server;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import de.cgabrisch.rock_paper_scissors.api.player.Player;
 import de.cgabrisch.rock_paper_scissors.api.round.Move;
 import de.cgabrisch.rock_paper_scissors.api.round.MoveRequest;
 import de.cgabrisch.rock_paper_scissors.api.round.RoundResult;
