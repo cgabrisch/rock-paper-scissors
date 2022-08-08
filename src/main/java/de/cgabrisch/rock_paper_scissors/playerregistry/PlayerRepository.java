@@ -9,15 +9,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import de.cgabrisch.rock_paper_scissors.api.player.Opponents;
 import de.cgabrisch.rock_paper_scissors.api.player.Player;
 import reactor.core.publisher.Mono;
 
-@Service
-class AvailablePlayersService {
-    private final static Logger log = LoggerFactory.getLogger(AvailablePlayersService.class);
+@Repository
+class PlayerRepository {
+    private final static Logger log = LoggerFactory.getLogger(PlayerRepository.class);
 
     private final Executor requestOppoentsExecutor = Executors
             .newSingleThreadScheduledExecutor((runnable) -> new Thread(runnable, "opponents-request"));

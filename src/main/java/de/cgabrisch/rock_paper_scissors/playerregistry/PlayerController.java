@@ -21,24 +21,24 @@ class PlayerController {
     private PlayerFactory playerFactory;
     
     @Autowired
-    private AvailablePlayersService availablePlayersService;
+    private PlayerRepository playerRepository;
 
     @PostMapping("/players")
     Mono<PlayerId> newPlayer(@RequestBody @Valid PlayerRegistration playerRegistration) {
         return Mono.just(playerRegistration)
                 .map(playerFactory::createPlayer)
-                .doOnNext(availablePlayersService::addPlayer)
+                .doOnNext(playerRepository::addPlayer)
                 .map(Player::id)
                 .map(PlayerId::new);
     }
     
     @PostMapping("/opponents/request")
     Mono<Opponents> requestOpponents() {
-        return this.availablePlayersService.requestOpponents();
+        return this.playerRepository.requestOpponents();
     }
     
     @PostMapping("/opponents/release")
     void releaseOpponents(@RequestBody Opponents opponents) {
-        this.availablePlayersService.releaseOpponents(opponents);
+        this.playerRepository.releaseOpponents(opponents);
     }
 }
