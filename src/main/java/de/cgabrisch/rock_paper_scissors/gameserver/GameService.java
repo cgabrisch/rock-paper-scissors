@@ -59,15 +59,20 @@ class GameService {
         
         return Mono.zip(movePlayer1, movePlayer2).map((moves) -> {
             Move move1 = moves.getT1();
-            int sanitizedStake1 = Math.min(player1.credit(), move1.stake());
+            int sanitizedStake1 = getSanitizedStake(player1, move1);
             Move move2 = moves.getT2();
-            int sanitizedStake2 = Math.min(player2.credit(), move2.stake());
+            int sanitizedStake2 = getSanitizedStake(player2, move2);
+
             int stake = Math.min(sanitizedStake1, sanitizedStake2);
             
             Calls calls = new Calls(move1.symbol(), move2.symbol());
 
             return new Round(roundId, player1, player2, calls, stake);
         });
+    }
+
+    private int getSanitizedStake(Player player, Move move) {
+        return Math.max(1, Math.min(player.credit(), move.stake()));
     }
     
     private Opponents updateOpponentStatsAfterRound(Opponents opponents, Round round) {
