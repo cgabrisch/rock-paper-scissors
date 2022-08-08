@@ -17,10 +17,10 @@ import reactor.core.publisher.Flux;
 @Validated
 public class GameController {
     @Autowired
-    private PlayService playService;
+    private GameService gameService;
 
     @GetMapping("/play/{rounds}")
     public Flux<Round> playGame(@PathVariable @Valid @Min(1) int rounds) {
-        return this.playService.playRounds(rounds);
+        return this.gameService.playRounds(rounds);
     }
 }

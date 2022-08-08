@@ -18,15 +18,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class PlayService {
-    private final static Logger log = LoggerFactory.getLogger(PlayService.class);
+public class GameService {
+    private final static Logger log = LoggerFactory.getLogger(GameService.class);
     
     private final String playerRegistryUrl;
     private final RoundService roundService;
     
-    
     @Autowired
-    public PlayService(
+    public GameService(
             @Value("${player_registry.url}") String playerRegistryUrl,
             RoundService roundService) {
         this.playerRegistryUrl = playerRegistryUrl;
@@ -42,12 +41,10 @@ public class PlayService {
             Player player1 = opponents.player1();
             Player player2 = opponents.player2();
             
-            String uuid = UUID.randomUUID().toString();
-            log.debug("Playing round {}", uuid);
+            String roundId = UUID.randomUUID().toString();
+            log.debug("Playing round {}", roundId);
             
-            Mono<Round> roundTry = roundTry(uuid, player1, player2);
-            
-            return roundTry
+            return roundMono(roundId, player1, player2)
               .doOnNext(round -> {
                   Flux.concat(
                           roundService.notifyPlayer(player1, round), roundService.notifyPlayer(player2, round),
@@ -56,11 +53,11 @@ public class PlayService {
         });
     }
 
-    private Mono<Round> roundTry(String uuid, Player player1, Player player2) {
-        Mono<Move> movePlayer1 = roundService.getMoveFromPlayer(player1, uuid, player2.name());
-        Mono<Move> movePlayer2 = roundService.getMoveFromPlayer(player2, uuid, player1.name());
+    private Mono<Round> roundMono(String roundId, Player player1, Player player2) {
+        Mono<Move> movePlayer1 = roundService.getMoveFromPlayer(player1, roundId, player2.name());
+        Mono<Move> movePlayer2 = roundService.getMoveFromPlayer(player2, roundId, player1.name());
         
-        Mono<Round> roundTry = Mono.zip(movePlayer1, movePlayer2).map((moves) -> {
+        return Mono.zip(movePlayer1, movePlayer2).map((moves) -> {
             Move move1 = moves.getT1();
             int sanitizedStake1 = Math.min(player1.credit(), move1.stake());
             Move move2 = moves.getT2();
@@ -69,9 +66,8 @@ public class PlayService {
             
             Calls calls = new Calls(move1.symbol(), move2.symbol());
 
-            return new Round(uuid, player1, player2, calls, stake);
+            return new Round(roundId, player1, player2, calls, stake);
         });
-        return roundTry;
     }
     
     private Opponents updateOpponentStatsAfterRound(Opponents opponents, Round round) {
