@@ -32,7 +32,7 @@ class BotController {
     @Value("${player_registry.url}")
     private String playerRegistryUrl;
     
-    @Value("${own_server.url}")
+    @Value("${bot_server.url}")
     private String ownUrl;
     
     private final Map<String, Bot> playerIdsToBots = new HashMap<>();
